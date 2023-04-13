@@ -2,18 +2,6 @@
 python script that report every player of the game exept your friend and you 
 
 ## How to use
-requirements: python
-```
-pip install lcu_driver
-```
-for create a AutoReport.exe 
-```
-pip install PyInstaller # if you don't have it
-python3 -O -m PyInstaller AutoReport.py  --onefile -n AutoReport
-``` 
-the AutoReport.exe must be in ./dist/AutoReport.exe
+just go to https://github.com/tempo-riz/AutoReport/releases/tag/1.0.0
 
-or run normaly with python
-```
-python3 AutoReport.py
-```
+download AutoReport.exe and run it, the rest is automatic :)

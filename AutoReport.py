@@ -1,12 +1,14 @@
 from lcu_driver import Connector
 from time import sleep
+import os
 
 connector = Connector()
 @connector.ready
 
 async def connect(connection):
-    print("Welcome to the Auto report Bot 🙂 !")
-    print("Please wait for the end of the game.")
+    print("waiting for the end of the game\n")
+    gameIDs = []
+
     while True:
         users = {}
         friends = []
@@ -21,25 +23,50 @@ async def connect(connection):
         try:
             got = await connection.request('get', "/lol-end-of-game/v1/eog-stats-block")
             got = await got.json()
-            #print(got)
+
             try:
                 gameID = got['gameId']
+                if gameID in gameIDs:
+                    continue
+                gameIDs.append(gameID)
+                os.system('cls' if os.name == 'nt' else 'clear') # clear console
+
                 teams = got['teams']
-                print(gameID)
+
+                to_report = []
                 for team in teams:
+                    is_ally_team = False
+                    
                     for player in team['players']:
-                        if player['summonerId'] not in friends:
-                            _report = {
-                                "comment": "trash talk, toxic, racist",
-                                "gameId": gameID,
-                                "offenses": "Negative Attitude, Verbal Abuse",
-                                "reportedSummonerId": player['summonerId']
-                            }
-                            response = await connection.request('post', "/lol-end-of-game/v2/player-complaints", data=_report)
-                            print(player['summonerId'], player['summonerName'], "is reported.")
-                            response = await response.json()
-                            print(response)
-                print("all the people get report 🙂 !")
+                        if player['summonerId'] in friends:
+                            is_ally_team = True
+                            print(player['summonerName'], ": keep it L9 😎")
+                        else:
+                            print(player['summonerName'], ": reported.")
+                            to_report.append(player['summonerId'])
+                            
+                            
+                    if is_ally_team:
+                        print("----- Ally team -----\n")
+                    else:
+                        print("----- Enemy team -----\n")
+
+                print("my done here is job 🫡\n")
+                    
+
+                while len(to_report) > 0:
+                    _report = {
+                        "comment": "trash talk, toxic, racist, inting, trolling, feeding, afk, etc.",
+                        "gameId": gameID,
+                        "offenses": "Negative Attitude, Verbal Abuse, Intentional Feeding",
+                        "reportedSummonerId": to_report.pop()
+                    }
+                    response = await connection.request('post', "/lol-end-of-game/v2/player-complaints", data=_report)
+                    response = await response.json()
+
+                    # print(response)
+                    
+                
                 pass
             except KeyError:
                 pass
